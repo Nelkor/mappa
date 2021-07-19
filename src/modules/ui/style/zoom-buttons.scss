@@ -1,0 +1,17 @@
+.zoom-buttons {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  display: flex;
+  flex-direction: column;
+  user-select: none;
+  pointer-events: none;
+
+  button {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 12px;
+    pointer-events: auto;
+    font-size: 20px;
+  }
+}

@@ -8,13 +8,15 @@ type ComputedState = {
   zoom: number
 }
 
+const ZOOM_FACTOR = 1.4
+
 // TODO center & zoom – animatedState
 //  Начать с zoom (+ кнопки)
 const state = {
   width: 0,
   height: 0,
   center: { ...originCenter },
-  zoom: 1.4,
+  zoom: ZOOM_FACTOR,
 }
 
 export const setSize = (width: number, height: number): void => {
@@ -27,8 +29,16 @@ export const setCenter = (x: number, y: number): void => {
   state.center.y = y
 }
 
-export const setZoom = (zoom: number): void => {
-  state.zoom = Math.max(1, zoom)
+const setZoom = (zoom: number): void => {
+  state.zoom = Math.min(14, Math.max(1, zoom))
+}
+
+export const incZoom = (): void => {
+  setZoom(state.zoom * ZOOM_FACTOR)
+}
+
+export const decZoom = (): void => {
+  setZoom(state.zoom / ZOOM_FACTOR)
 }
 
 export const getCenter = (): Readonly<Point> => state.center
