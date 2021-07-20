@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import { incZoom, decZoom } from '@/map/viewport'
+import { incZoom, decZoom } from '@/map'
 
 export default {
   name: 'ZoomButtons',

@@ -31,7 +31,7 @@ export const updateAnimated = (
   item.from = getAnimatedValue(item, time)
   item.to = to
   item.startedAt = time
-  item.duration = duration
+  item.duration = Math.max(1, duration)
 }
 
 export const createAnimatedUpdater =

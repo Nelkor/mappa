@@ -3,8 +3,15 @@ import {
   dispatchMouseMove,
   dispatchUpOrLeave,
 } from '@/world/events'
-import { getCenter, setCenter, getViewport } from '@/map/viewport'
+import {
+  getCenter,
+  setCenter,
+  getViewport,
+  changeZoom,
+  changeCenter,
+} from '@/map/viewport'
 import { canvas } from '@/map/canvas'
+import { originCenter } from '@/world'
 
 type MouseEventName = 'mousedown' | 'mouseup' | 'mousemove' | 'mouseleave'
 type MouseHandler = (event: MouseEvent) => void
@@ -15,13 +22,39 @@ export const eventHandlers: Readonly<typeof handlers> = handlers
 
 const state = {
   isDragOn: false,
+  isAnimationOn: false,
   savedCenter: { ...getCenter() },
   clickOrigin: { x: 0, y: 0 },
 }
 
-handlers.set('mousedown', ({ offsetX, offsetY }) => {
-  const { top, left, zoom } = getViewport()
+const clearAnimation = () => {
+  state.isAnimationOn = false
+}
 
+export const incZoom = (): void => {
+  state.isAnimationOn = true
+
+  changeZoom(true).then(clearAnimation)
+}
+
+export const decZoom = (): void => {
+  state.isAnimationOn = true
+
+  changeZoom(false).then(clearAnimation)
+}
+
+export const centerToOrigin = (): void => {
+  state.isAnimationOn = true
+
+  changeCenter(originCenter.x, originCenter.y).then(clearAnimation)
+}
+
+handlers.set('mousedown', ({ offsetX, offsetY }) => {
+  if (state.isAnimationOn) {
+    return
+  }
+
+  const { top, left, zoom } = getViewport()
   const x = left + offsetX / zoom
   const y = top + offsetY / zoom
 
@@ -40,7 +73,6 @@ handlers.set('mousedown', ({ offsetX, offsetY }) => {
 handlers.set('mousemove', ({ offsetX, offsetY }) => {
   const { isDragOn, clickOrigin, savedCenter } = state
   const { top, left, zoom } = getViewport()
-
   const x = left + offsetX / zoom
   const y = top + offsetY / zoom
 
