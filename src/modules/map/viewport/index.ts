@@ -1,4 +1,9 @@
 import { originCenter } from '@/world'
+import {
+  createAnimated,
+  getAnimatedValue,
+  createAnimatedUpdater,
+} from '@/helpers/animation'
 
 type ComputedState = {
   top: number
@@ -9,6 +14,8 @@ type ComputedState = {
 }
 
 const ZOOM_FACTOR = 1.4
+const ZOOM_LIMIT = 14
+const ZOOM_DURATION = 200
 
 // TODO center & zoom – animatedState
 //  Начать с zoom (+ кнопки)
@@ -16,7 +23,7 @@ const state = {
   width: 0,
   height: 0,
   center: { ...originCenter },
-  zoom: ZOOM_FACTOR,
+  zoom: createAnimated(ZOOM_FACTOR),
 }
 
 export const setSize = (width: number, height: number): void => {
@@ -29,16 +36,14 @@ export const setCenter = (x: number, y: number): void => {
   state.center.y = y
 }
 
-const setZoom = (zoom: number): void => {
-  state.zoom = Math.min(14, Math.max(1, zoom))
-}
+const setZoom = createAnimatedUpdater(state.zoom)
 
 export const incZoom = (): void => {
-  setZoom(state.zoom * ZOOM_FACTOR)
+  setZoom(Math.min(ZOOM_LIMIT, state.zoom.to * ZOOM_FACTOR), ZOOM_DURATION)
 }
 
 export const decZoom = (): void => {
-  setZoom(state.zoom / ZOOM_FACTOR)
+  setZoom(Math.max(1, state.zoom.to / ZOOM_FACTOR), ZOOM_DURATION)
 }
 
 export const getCenter = (): Readonly<Point> => state.center
@@ -46,7 +51,9 @@ export const getCenter = (): Readonly<Point> => state.center
 // TODO функцию для остановки анимации центра?
 
 export const getViewport = (): Readonly<ComputedState> => {
-  const { width, height, center, zoom } = state
+  const zoom = getAnimatedValue(state.zoom, performance.now())
+
+  const { width, height, center } = state
   const scaledWidth = width / zoom
   const scaledHeight = height / zoom
   const top = center.y - scaledHeight / 2

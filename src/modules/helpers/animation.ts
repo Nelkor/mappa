@@ -37,7 +37,7 @@ export const updateAnimated = (
 export const createAnimatedUpdater =
   (item: Animated): AnimatedUpdater =>
   (to, duration) => {
-    const now = Date.now()
+    const now = performance.now()
 
     updateAnimated(item, to, now, duration)
   }
